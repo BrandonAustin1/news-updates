@@ -28,8 +28,23 @@ function parseEconValue(raw?: string): number | null {
 
 const INVERTED_METRICS = ['unemployment', 'jobless', 'claimant', 'deficit', 'inventories'];
 
-function formatActualWithDeviation(title: string, actual?: string, forecast?: string): string {
+function formatActualWithDeviation(title: string, actual?: string, forecast?: string, previous?: string): string {
+  const t = title.toLowerCase();
+  const isNonData =
+    t.includes('statement') ||
+    t.includes('projection') ||
+    t.includes('minutes') ||
+    t.includes('speaks') ||
+    t.includes('testifies') ||
+    t.includes('press conference') ||
+    ((!forecast || forecast === 'N/A') && (!previous || previous === 'N/A'));
+
+  if (isNonData) {
+    return 'Status: Completed (Statement / Document)';
+  }
+
   if (!actual || actual.trim() === '') return 'Actual: Pending';
+
   const aNum = parseEconValue(actual);
   const fNum = parseEconValue(forecast);
   if (aNum === null || fNum === null) return `Actual: ${actual}`;
@@ -37,15 +52,19 @@ function formatActualWithDeviation(title: string, actual?: string, forecast?: st
   const diff = aNum - fNum;
   if (Math.abs(diff) < 0.0001) return `Actual: ${actual} ⚪ In Line`;
 
-  const isInverted = INVERTED_METRICS.some(k => title.toLowerCase().includes(k));
+  const isInverted = INVERTED_METRICS.some(k => t.includes(k));
   const isBeat = isInverted ? diff < 0 : diff > 0;
   return isBeat ? `Actual: ${actual} 🟢 ⬆️ Beat` : `Actual: ${actual} 🔴 ⬇️ Miss`;
 }
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const currencies = (searchParams.get('currencies') || 'USD,GBP,JPY').toUpperCase().split(',');
-  const impacts = (searchParams.get('impacts') || 'High,Medium').split(',').map(i => i.toLowerCase());
+  const currencies = (searchParams.get('currencies') || 'USD,GBP,JPY,CAD,EUR,AUD,NZD,CHF')
+    .toUpperCase()
+    .split(',');
+  const impacts = (searchParams.get('impacts') || 'High,Medium')
+    .split(',')
+    .map(i => i.toLowerCase());
   const shouldGroup = searchParams.get('group') !== 'false';
 
   try {
@@ -119,7 +138,7 @@ export async function GET(req: NextRequest) {
             const tag = e.impact.toLowerCase() === 'high' ? '🔴 High' : '🟠 Medium';
             return [
               `${idx + 1}. ${e.title} [${tag}]`,
-              `   • ${formatActualWithDeviation(e.title, e.actual, e.forecast)}`,
+              `   • ${formatActualWithDeviation(e.title, e.actual, e.forecast, e.previous)}`,
               `   • Forecast: ${e.forecast || 'N/A'} | Previous: ${e.previous || 'N/A'}`,
             ].join('\\n');
           })
@@ -154,7 +173,7 @@ export async function GET(req: NextRequest) {
           `Impact: ${ev.impact}`,
           `Forecast: ${ev.forecast || 'N/A'}`,
           `Previous: ${ev.previous || 'N/A'}`,
-          formatActualWithDeviation(ev.title, ev.actual, ev.forecast),
+          formatActualWithDeviation(ev.title, ev.actual, ev.forecast, ev.previous),
         ].join('\\n');
 
         const hasActual = Boolean(ev.actual?.trim());
