@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', flag: '🇺🇸' },
@@ -82,29 +83,46 @@ export default function CalendarDashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-[#090A0F] text-zinc-100 p-4 sm:p-8 font-sans">
+    <main className="min-h-screen bg-[#08090C] text-zinc-100 antialiased p-4 sm:p-8 font-sans">
       <div className="max-w-4xl mx-auto space-y-6">
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-800 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono mb-2">
-              <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-              LIVE FEED ENGINE ACTIVE
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">News Updates Dispatcher</h1>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-              RFC 5545 calendar subscription with direct bureau actuals (BLS, BoE, ONS, StatCan).
-            </p>
-          </div>
-          <div className="font-mono text-xs text-zinc-400 bg-zinc-900 border border-zinc-800 rounded-lg p-2.5 self-start">
-            <div>Tracking: <span className="text-white font-bold">{selectedCurrencies.length} Assets</span></div>
-            <div>Filters: <span className="text-cyan-400 font-bold uppercase">{selectedImpacts.join(', ')}</span></div>
+
+        {/* Global Tab Navigation Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800/80">
+          <nav className="flex items-center gap-1.5 p-1 bg-zinc-900/80 border border-zinc-800 rounded-xl self-start">
+            <span className="px-4 py-2 rounded-lg bg-cyan-500 text-black font-mono text-xs font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+              📅 CALENDAR GENERATOR
+            </span>
+            <Link
+              href="/events"
+              className="px-4 py-2 rounded-lg text-zinc-400 hover:text-white font-mono text-xs font-medium hover:bg-zinc-800 transition flex items-center gap-1.5"
+            >
+              <span>⚡ LIVE TERMINAL</span>
+              <span className="text-[10px] text-cyan-400 font-bold">→</span>
+            </Link>
+          </nav>
+
+          <div className="font-mono text-xs text-zinc-400 bg-zinc-900/80 border border-zinc-800 rounded-xl px-3 py-2 self-start sm:self-auto flex items-center gap-3">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              RFC 5545 Live
+            </span>
+            <span className="text-zinc-700">|</span>
+            <span>{selectedCurrencies.length} Assets</span>
           </div>
         </div>
 
+        {/* Header Title */}
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            News Updates Dispatcher
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+            Build your tailored iOS/Mac Calendar subscription feed, or open the Live Terminal to view releases on the web.
+          </p>
+        </div>
+
         {/* 1. Currencies */}
-        <section className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 space-y-3">
+        <section className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400">
               1. Assets & Currencies
@@ -160,7 +178,7 @@ export default function CalendarDashboard() {
         </section>
 
         {/* 2. Impact Filters */}
-        <section className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5 space-y-3">
+        <section className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-5 space-y-3">
           <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-zinc-400">
             2. Volatility Impact Tier
           </h2>
@@ -200,10 +218,10 @@ export default function CalendarDashboard() {
         </section>
 
         {/* 3. Clustering Toggle */}
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-xl p-4 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold text-zinc-200">Cluster Simultaneous Drops</div>
-            <div className="text-xs text-zinc-400">Merges same-minute releases (e.g. CAD CPI + Median + Trimmed) into one card.</div>
+            <div className="text-xs text-zinc-400">Merges concurrent releases (e.g. CAD CPI + Median + Trimmed) into one calendar card.</div>
           </div>
           <button
             type="button"
@@ -248,6 +266,13 @@ export default function CalendarDashboard() {
             >
               📅 ONE-TAP SUBSCRIBE (APPLE CALENDAR)
             </a>
+          </div>
+
+          <div className="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-xs text-zinc-400">
+            <span>Want to view current releases on the web instead?</span>
+            <Link href="/events" className="text-cyan-400 hover:underline font-mono font-bold">
+              Open Live Macro Terminal →
+            </Link>
           </div>
         </section>
 
